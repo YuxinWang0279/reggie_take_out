@@ -12,6 +12,9 @@ import com.takeout.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +29,8 @@ public class SetmealController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @CacheEvict(value = "setmealCache",allEntries = true)
     @PostMapping
     public R<String> addSetmeal(@RequestBody SetmealDto setmealDto){
         setmealService.addSetmeal(setmealDto);
@@ -72,12 +77,14 @@ public class SetmealController {
     }
 
 
+    @CacheEvict(value = "setmealCache",allEntries = true)
     @DeleteMapping
     public R<String> deleteById(Long ids){
         setmealService.deleteById(ids);
         return R.success("删除成功");
     }
 
+    @Cacheable(value = "setmealCache",key = "#categoryId")
     @GetMapping("list")
     public R<List<SetmealDto>> getSetmealByCategoryId(long categoryId){
         List<SetmealDto> list = setmealService.getByCategoryId(categoryId);

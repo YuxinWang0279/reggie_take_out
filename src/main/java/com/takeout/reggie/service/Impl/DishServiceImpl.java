@@ -72,10 +72,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
-    public List<DishDto> getByCategoryId(long categoryId, int status) {
+    public List<DishDto> getByCategoryId(long categoryId, Integer status) {
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Dish::getCategoryId,categoryId);
-        queryWrapper.eq(Dish::getStatus,status);
+        queryWrapper.eq(status!=null,Dish::getStatus,status);
         List<Dish> list = this.list(queryWrapper);
         List<DishDto> dishDtos = list.stream().map(
                 (item)->{

@@ -123,9 +123,12 @@ public class DishController {
     }
 
     @GetMapping("/dish/list")
-    public R<List<DishDto>> getDishByCategoryId(long categoryId,int status){
+    public R<List<DishDto>> getDishByCategoryId(Long categoryId,Integer status){
+        String key = "dish_" + categoryId;
+        if(status!=null){
+            key+= "_" + status;
+        }
         //construct key
-        String key = "dish_" + categoryId + "_" + status;
         List<DishDto> list = null;
         //search in redis
         list = (List<DishDto>) redisTemplate.opsForValue().get(key);
@@ -136,5 +139,4 @@ public class DishController {
         redisTemplate.opsForValue().set(key,list,60, TimeUnit.MINUTES);
         return R.success(list);
     }
-
 }
