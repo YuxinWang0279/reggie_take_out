@@ -15,9 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,6 +33,9 @@ public class DishController {
     private DishService dishService;
     @Autowired
     private DishFlavorService dishFlavorService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 根据type查询分类
      * @param category
@@ -53,12 +58,17 @@ public class DishController {
     @PostMapping("/dish")
     public R<String> updateByID(@RequestBody DishDto dishDto){
         dishService.add(dishDto);
+        //delete relevant redis cache data
+        String key = "dish_" + dishDto.getCategoryId() + "_1";
+        redisTemplate.delete(key);
         return R.success("添加成功");
     }
 
     @PutMapping("/dish")
     public R<String> editByID(@RequestBody DishDto dishDto){
         dishService.updateWithFlavors(dishDto);
+        String key = "dish_" + dishDto.getCategoryId() + "_1";
+        redisTemplate.delete(key);
         return R.success("添加成功");
     }
     @GetMapping("/dish/page")
@@ -113,8 +123,17 @@ public class DishController {
     }
 
     @GetMapping("/dish/list")
-    public R<List<DishDto>> getDishByCategoryId(long categoryId){
-        List<DishDto> list = dishService.getByCategoryId(categoryId);
+    public R<List<DishDto>> getDishByCategoryId(long categoryId,int status){
+        //construct key
+        String key = "dish_" + categoryId + "_" + status;
+        List<DishDto> list = null;
+        //search in redis
+        list = (List<DishDto>) redisTemplate.opsForValue().get(key);
+        //if found, return
+        if(list!=null) return R.success(list);
+        //if not, query from database, and store the result to redis
+        list = dishService.getByCategoryId(categoryId,status);
+        redisTemplate.opsForValue().set(key,list,60, TimeUnit.MINUTES);
         return R.success(list);
     }
 

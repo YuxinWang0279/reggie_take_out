@@ -10,7 +10,6 @@ import com.takeout.reggie.service.DishFlavorService;
 import com.takeout.reggie.service.DishService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,9 +72,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
-    public List<DishDto> getByCategoryId(long categoryId) {
+    public List<DishDto> getByCategoryId(long categoryId, int status) {
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Dish::getCategoryId,categoryId);
+        queryWrapper.eq(Dish::getStatus,status);
         List<Dish> list = this.list(queryWrapper);
         List<DishDto> dishDtos = list.stream().map(
                 (item)->{
