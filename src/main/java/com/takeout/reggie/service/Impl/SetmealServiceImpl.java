@@ -26,7 +26,20 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     @Override
     @Transactional
     public void addSetmeal(SetmealDto setmealDto) {
-        this.save(setmealDto);
+        // check exit? update: save
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Setmeal::getId,setmealDto.getId());
+        Setmeal setmeal = this.getOne(queryWrapper);
+        if(setmeal!=null){
+            this.updateById(setmealDto);
+            // clear prev data in setmeal dish
+            LambdaQueryWrapper<SetmealDish> queryWrapper1 = new LambdaQueryWrapper<>();
+            queryWrapper1.eq(SetmealDish::getSetmealId,setmealDto.getId());
+            setmealDishService.remove(queryWrapper1);
+        }
+        else
+            this.save(setmealDto);
+        //update new data
         List<SetmealDish> list = setmealDto.getSetmealDishes();
         list = list.stream().map(
                 (item)->{

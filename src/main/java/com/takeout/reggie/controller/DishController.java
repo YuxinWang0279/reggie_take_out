@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -122,6 +123,11 @@ public class DishController {
 
     }
 
+    @DeleteMapping("/dish")
+    public R<String> deleteById(@RequestParam List<Long> ids){
+        dishService.removeByIds(ids);
+        return R.success("Delete successfully");
+    }
     @GetMapping("/dish/list")
     public R<List<DishDto>> getDishByCategoryId(Long categoryId,Integer status){
         String key = "dish_" + categoryId;
@@ -138,5 +144,17 @@ public class DishController {
         list = dishService.getByCategoryId(categoryId,status);
         redisTemplate.opsForValue().set(key,list,60, TimeUnit.MINUTES);
         return R.success(list);
+    }
+
+    @PostMapping("/dish/status/{status}")
+    public R<String> updateDishStatus(@PathVariable int status,@RequestParam List<Long> ids){
+        ids.stream().forEach(
+                (id)->{
+                    Dish dish = dishService.getById((Serializable) id);
+                    dish.setStatus(status);
+                    dishService.updateById(dish);
+                }
+        );
+        return R.success("Update Successfully");
     }
 }

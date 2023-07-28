@@ -5,12 +5,19 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.takeout.reggie.pojo.Employee;
 import com.takeout.reggie.common.R;
 import com.takeout.reggie.service.empService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -20,7 +27,7 @@ public class loginController {
     private empService empservice;
 
     @PostMapping("/login")
-    public R<Employee> login(@RequestBody Employee emp, HttpServletRequest request){
+    public R<Employee> login(@RequestBody Employee emp, HttpServletRequest request, HttpServletResponse response){
         //1. 将用户提交的password改为md5加密格式
         String password = emp.getPassword();
         password = DigestUtils.md5DigestAsHex(password.getBytes());
@@ -41,7 +48,20 @@ public class loginController {
             return R.error("员工已禁用");
         }
         //6. 登陆成功，将员工id录入session并返回登陆成功结果
-        request.getSession().setAttribute("Employee",emp_f.getId());
+        //request.getSession().setAttribute("Employee",emp_f.getId());
+
+        //6. store userId into JWT certification, and pass to session
+        Map<String,Object> claims = new HashMap<>();
+        long id = emp_f.getId();
+        claims.put("Employee", id);
+        String jwt = Jwts.builder()
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS256,"secret")
+                .setExpiration(new Date(System.currentTimeMillis()+3600 * 1000))
+                .compact();
+        Cookie cookie = new Cookie("JWT",jwt);
+        cookie.setPath("/");
+        response.addCookie(cookie);
         return R.success(emp_f);
     }
 
@@ -78,7 +98,7 @@ public class loginController {
         //条件构造器
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
         //过滤条件
-        queryWrapper.like(name!=null,Employee::getUsername,name);
+        queryWrapper.like(name!=null,Employee::getName,name);
         //添加排序条件
         queryWrapper.orderByDesc(Employee::getUpdateTime);
         //执行查询

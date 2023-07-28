@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.takeout.reggie.DTO.DishDto;
 import com.takeout.reggie.DTO.SetmealDto;
 import com.takeout.reggie.common.R;
+import com.takeout.reggie.pojo.Dish;
 import com.takeout.reggie.pojo.Employee;
 import com.takeout.reggie.pojo.Setmeal;
+import com.takeout.reggie.pojo.SetmealDish;
 import com.takeout.reggie.service.CategoryService;
+import com.takeout.reggie.service.SetmealDishService;
 import com.takeout.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -15,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +34,9 @@ public class SetmealController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private SetmealDishService setmealDishService;
 
     @CacheEvict(value = "setmealCache",allEntries = true)
     @PostMapping
@@ -79,8 +87,12 @@ public class SetmealController {
 
     @CacheEvict(value = "setmealCache",allEntries = true)
     @DeleteMapping
-    public R<String> deleteById(Long ids){
-        setmealService.deleteById(ids);
+    public R<String> deleteById(@RequestParam List<Long> ids){
+        ids.stream().forEach(
+                (id)->{
+                    setmealService.deleteById(id);
+                }
+        );
         return R.success("删除成功");
     }
 
@@ -89,5 +101,45 @@ public class SetmealController {
     public R<List<SetmealDto>> getSetmealByCategoryId(long categoryId){
         List<SetmealDto> list = setmealService.getByCategoryId(categoryId);
         return R.success(list);
+    }
+
+
+    /**
+     * return setmeal information according to id;
+     * @param id
+     * @return
+     */
+    @GetMapping("{id}")
+    public R<SetmealDto> getSetmealById(@PathVariable long id){
+        Setmeal setmeal = setmealService.getById(id);
+        SetmealDto setmealDto = new SetmealDto();
+        BeanUtils.copyProperties(setmeal,setmealDto);
+
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.eq(SetmealDish::getSetmealId,id);
+        setmealDto.setSetmealDishes(setmealDishService.list(queryWrapper));
+        return R.success(setmealDto);
+    }
+
+    /**
+     * edit setmeal information
+     * @return
+     */
+    @PutMapping
+    public R<String> editSetmeal(@RequestBody SetmealDto setmealDto){
+        setmealService.addSetmeal(setmealDto);
+        return R.success("Edit successfully");
+    }
+
+    @PostMapping("status/{status}")
+    public R<String> updateDishStatus(@PathVariable int status,@RequestParam List<Long> ids){
+        ids.stream().forEach(
+                (id)->{
+                    Setmeal setmeal = setmealService.getById((Serializable) id);
+                    setmeal.setStatus(status);
+                    setmealService.updateById(setmeal);
+                }
+        );
+        return R.success("Update Successfully");
     }
 }
