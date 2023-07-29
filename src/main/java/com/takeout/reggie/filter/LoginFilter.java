@@ -50,6 +50,14 @@ public class LoginFilter implements Filter {
             return;
         }
 
+        //4-1 employee login
+        if(request.getSession().getAttribute("Employee")!=null){
+            //request.getSession().getId(): session id 不是userId
+            log.info("用户已登陆,用户id{}",request.getSession().getAttribute("Employee"));
+            BaseContext.setCurrentId((Long) request.getSession().getAttribute("Employee"));
+            filterChain.doFilter(servletRequest,servletResponse);
+            return;
+        }
         //4-2 user login
         if(request.getSession().getAttribute("User")!=null){
             //request.getSession().getId(): session id 不是userId
@@ -59,28 +67,28 @@ public class LoginFilter implements Filter {
             return;
         }
         //4-1.判断登陆状态，如果已经登陆则直接放行
-        String jwt = "";
-        Cookie[] cookies = request.getCookies();
-        if(cookies!=null){
-            for(Cookie cookie:cookies){
-                if(cookie.getName().equals("JWT"))
-                    jwt = cookie.getValue();
-            }
-            try{
-                Claims claims = Jwts.parser()
-                        .setSigningKey("secret")
-                        .parseClaimsJws(jwt)
-                        .getBody();
-                log.info("用户已登陆,用户id{}",claims.get("Employee"));
-                Number id = (Number)claims.get("Employee");
-                BaseContext.setCurrentId(id.longValue());
-                filterChain.doFilter(servletRequest,servletResponse);
-                return;
-            }
-            catch (Exception ex){
-                log.info(ex.toString());
-            }
-        }
+//        String jwt = "";
+//        Cookie[] cookies = request.getCookies();
+//        if(cookies!=null){
+//            for(Cookie cookie:cookies){
+//                if(cookie.getName().equals("JWT"))
+//                    jwt = cookie.getValue();
+//            }
+//            try{
+//                Claims claims = Jwts.parser()
+//                        .setSigningKey("secret")
+//                        .parseClaimsJws(jwt)
+//                        .getBody();
+//                log.info("用户已登陆,用户id{}",claims.get("Employee"));
+//                Number id = (Number)claims.get("Employee");
+//                BaseContext.setCurrentId(id.longValue());
+//                filterChain.doFilter(servletRequest,servletResponse);
+//                return;
+//            }
+//            catch (Exception ex){
+//                log.info(ex.toString());
+//            }
+//        }
 
          //request.getSession().getAttribute("Employee")!=null
             //request.getSession().getId(): session id 不是userId

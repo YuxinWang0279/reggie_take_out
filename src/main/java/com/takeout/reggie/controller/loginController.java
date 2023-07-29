@@ -48,31 +48,32 @@ public class loginController {
             return R.error("员工已禁用");
         }
         //6. 登陆成功，将员工id录入session并返回登陆成功结果
-        //request.getSession().setAttribute("Employee",emp_f.getId());
+        request.getSession().setAttribute("Employee",emp_f.getId());
 
         //6. store userId into JWT certification, and pass to session
-        Map<String,Object> claims = new HashMap<>();
-        long id = emp_f.getId();
-        claims.put("Employee", id);
-        String jwt = Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS256,"secret")
-                .setExpiration(new Date(System.currentTimeMillis()+3600 * 1000))
-                .compact();
-        Cookie cookie = new Cookie("JWT",jwt);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+//        Map<String,Object> claims = new HashMap<>();
+//        long id = emp_f.getId();
+//        claims.put("Employee", id);
+//        String jwt = Jwts.builder()
+//                .setClaims(claims)
+//                .signWith(SignatureAlgorithm.HS256,"secret")
+//                .setExpiration(new Date(System.currentTimeMillis()+3600 * 1000))
+//                .compact();
+//        Cookie cookie = new Cookie("JWT",jwt);
+//        cookie.setPath("/");
+//        response.addCookie(cookie);
         return R.success(emp_f);
     }
 
     @PostMapping("/logout")
     public R<String> logout(HttpServletRequest request){
-        Cookie[] cookies = request.getCookies();
-        for(Cookie cookie:cookies){
-            if(cookie.getName().equals("JWT")){
-                cookie.setValue("");
-            }
-        }
+//        Cookie[] cookies = request.getCookies();
+//        for(Cookie cookie:cookies){
+//            if(cookie.getName().equals("JWT")){
+//                cookie.setValue("");
+//            }
+//        }
+        request.getSession().removeAttribute("Employee");
         return R.success("退出登陆");
     }
 

@@ -26,8 +26,8 @@ spring:
           auth: true
           starttls:
             enable: true
-    username: username
-    password: password
+    username: wyx0279@gmail.com
+    password: zmbavrkkgyqegjle
 mybatis-plus:
   configuration:
     #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
