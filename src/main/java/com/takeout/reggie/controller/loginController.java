@@ -67,7 +67,12 @@ public class loginController {
 
     @PostMapping("/logout")
     public R<String> logout(HttpServletRequest request){
-        request.getSession().removeAttribute("Employee");
+        Cookie[] cookies = request.getCookies();
+        for(Cookie cookie:cookies){
+            if(cookie.getName().equals("JWT")){
+                cookie.setValue("");
+            }
+        }
         return R.success("退出登陆");
     }
 

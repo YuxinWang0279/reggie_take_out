@@ -49,6 +49,15 @@ public class LoginFilter implements Filter {
             log.info("本次请求{}不需要处理",requestURL);
             return;
         }
+
+        //4-2 user login
+        if(request.getSession().getAttribute("User")!=null){
+            //request.getSession().getId(): session id 不是userId
+            log.info("用户已登陆,用户id{}",request.getSession().getAttribute("User"));
+            BaseContext.setCurrentId((Long) request.getSession().getAttribute("User"));
+            filterChain.doFilter(servletRequest,servletResponse);
+            return;
+        }
         //4-1.判断登陆状态，如果已经登陆则直接放行
         String jwt = "";
         Cookie[] cookies = request.getCookies();
@@ -76,14 +85,7 @@ public class LoginFilter implements Filter {
          //request.getSession().getAttribute("Employee")!=null
             //request.getSession().getId(): session id 不是userId
 
-        //4-2
-        if(request.getSession().getAttribute("User")!=null){
-            //request.getSession().getId(): session id 不是userId
-            log.info("用户已登陆,用户id{}",request.getSession().getAttribute("User"));
-            BaseContext.setCurrentId((Long) request.getSession().getAttribute("User"));
-            filterChain.doFilter(servletRequest,servletResponse);
-            return;
-        }
+
 
         //5.如果未登陆则返回对应登陆结果,通过输出流向client输出数据
         log.info("用户未登陆");

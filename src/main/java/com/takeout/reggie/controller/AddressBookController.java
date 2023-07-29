@@ -36,6 +36,12 @@ public class AddressBookController {
         return R.success(addressBook);
     }
 
+    @PutMapping
+    public R<AddressBook> update(@RequestBody AddressBook addressBook){
+        log.info("addressBook:{}",addressBook);
+        addressBookService.updateById(addressBook);
+        return R.success(addressBook);
+    }
     /**
      * 设置默认地址
      */
@@ -101,5 +107,11 @@ public class AddressBookController {
 
         //SQL:select * from address_book where user_id = ? order by update_time desc
         return R.success(addressBookService.list(queryWrapper));
+    }
+
+    @DeleteMapping
+    public R<String> deleteById(long ids){
+        addressBookService.removeById(ids);
+        return R.success("Delete successfully");
     }
 }
