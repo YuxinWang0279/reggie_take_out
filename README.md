@@ -21,9 +21,9 @@ who can browse dishes online, add shopping carts, place orders, etc.
   * **JWT**: (deprecation) backend management identity verification
   * **JavaMailSender**: send random verification code to user email
 * Frontend
-  * **Vue.js**
-  * **Axios**
-  * **ElementUI**
+  * **Vue.js**: user interface
+  * **Axios**: 
+  * **ElementUI**: user interface
 * Other
   * **DigestUtils.md5DigestAsHex**: password encryption
   * **threadLocal**: store user id within same request
