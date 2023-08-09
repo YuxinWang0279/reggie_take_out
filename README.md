@@ -30,12 +30,10 @@ who can browse dishes online, add shopping carts, place orders, etc.
   * **MetaObjectHandler & @TableField**:  automatically data processing
   * **ExceptionHandler**:  global exception handler
   * **ObjectMapper**: change the object serialization method
-  * **ResourceHandlerRegistry**: url routing
+  * URL routing：
+    * Method 1: **ResourceHandlerRegistry**
+    * Method 2: **Nginx**
 
-
-## How to Use It
-
-## Deployment
 
 ## Preview
 #### System Management Background
