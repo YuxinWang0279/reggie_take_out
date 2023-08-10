@@ -22,7 +22,7 @@ who can browse dishes online, add shopping carts, place orders, etc.
   * **JavaMailSender**: send random verification code to user email
 * Frontend
   * **Vue.js**: user interface
-  * **Axios**: 
+  * **Axios**: HTTP request handling
   * **ElementUI**: user interface
 * Other
   * **DigestUtils.md5DigestAsHex**: password encryption
