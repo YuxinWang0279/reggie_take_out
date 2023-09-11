@@ -1,4 +1,4 @@
-# Reggie Takeout Full Stack
+# Takeout Full Stack
 Reggie Takeout is a software product customized for catering companies, including two parts: system management 
 background and mobile application. The system management background is mainly provided for the internal employees 
 of the enterprise, and can manage and maintain the internal dishes, packages, and orders.Mobile applications are mainly used by consumers, 
