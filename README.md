@@ -37,10 +37,14 @@ who can browse dishes online, add shopping carts, place orders, etc.
 
 ## Preview
 #### System Management Background
-![Video](https://github.com/yuxinwang0279/reggie_take_out/assets/110021928/423340f0-68ad-4c56-a46a-14bb32c8b2d9)
+
+
+https://github.com/wyx0279/Takeout/assets/110021928/bd6d16a4-fb30-4b99-8dc2-c492d73d0673
 
 #### Mobile Application
-![Video](https://github.com/yuxinwang0279/reggie_take_out/assets/110021928/679c9b47-446d-4532-8932-5ee54ee214b1)
+
+https://github.com/wyx0279/Takeout/assets/110021928/a5a32c61-8d5f-4d2b-b26c-60a3f432aef9
+
 
 
 ## Further Implementation
